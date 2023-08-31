@@ -80,7 +80,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.AddEndpoint<AuthorizeCallbackEndpoint>(EndpointNames.Authorize, ProtocolRoutePaths.AuthorizeCallback.EnsureLeadingSlash());
             builder.AddEndpoint<AuthorizeEndpoint>(EndpointNames.Authorize, ProtocolRoutePaths.Authorize.EnsureLeadingSlash());
-            builder.AddEndpoint<CheckSessionEndpoint>(EndpointNames.CheckSession, ProtocolRoutePaths.CheckSession.EnsureLeadingSlash());
+            builder.AddEndpoint<CheckSessionEndpoint>(EndpointNames.CheckSession, ProtocolRoutePaths.CheckSession.EnsureLeadingSlash()); // TODO: непонятно что такое check session и session в принципе, нужно разбираться
             builder.AddEndpoint<DeviceAuthorizationEndpoint>(EndpointNames.DeviceAuthorization, ProtocolRoutePaths.DeviceAuthorization.EnsureLeadingSlash());
             builder.AddEndpoint<DiscoveryKeyEndpoint>(EndpointNames.Discovery, ProtocolRoutePaths.DiscoveryWebKeys.EnsureLeadingSlash());
             builder.AddEndpoint<DiscoveryEndpoint>(EndpointNames.Discovery, ProtocolRoutePaths.DiscoveryConfiguration.EnsureLeadingSlash());
@@ -128,7 +128,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddTransient<IdentityServerTools>();
 
             builder.Services.AddTransient<IReturnUrlParser, OidcReturnUrlParser>();
-            builder.Services.AddScoped<IUserSession, DefaultUserSession>();
+            builder.Services.AddScoped<IUserSession, DefaultUserSession>(); // TODO: заменить, чтобы авторизовать через параметры?
             builder.Services.AddTransient(typeof(MessageCookie<>));
 
             builder.Services.AddCors();
@@ -155,6 +155,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddTransient<ICorsPolicyService, DefaultCorsPolicyService>();
             builder.Services.TryAddTransient<IProfileService, DefaultProfileService>();
             builder.Services.TryAddTransient<IConsentMessageStore, ConsentMessageStore>();
+            builder.Services.TryAddTransient<ILoginMessageStore, LoginMessageStore>();
             builder.Services.TryAddTransient<IMessageStore<LogoutMessage>, ProtectedDataMessageStore<LogoutMessage>>();
             builder.Services.TryAddTransient<IMessageStore<LogoutNotificationContext>, ProtectedDataMessageStore<LogoutNotificationContext>>();
             builder.Services.TryAddTransient<IMessageStore<ErrorMessage>, ProtectedDataMessageStore<ErrorMessage>>();

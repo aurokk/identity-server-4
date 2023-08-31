@@ -19,13 +19,13 @@ namespace IdentityServer4.Endpoints
     internal class AuthorizeEndpoint : AuthorizeEndpointBase
     {
         public AuthorizeEndpoint(
-           IEventService events,
-           ILogger<AuthorizeEndpoint> logger,
-           IdentityServerOptions options,
-           IAuthorizeRequestValidator validator,
-           IAuthorizeInteractionResponseGenerator interactionGenerator,
-           IAuthorizeResponseGenerator authorizeResponseGenerator,
-           IUserSession userSession)
+            IEventService events,
+            ILogger<AuthorizeEndpoint> logger,
+            IdentityServerOptions options,
+            IAuthorizeRequestValidator validator,
+            IAuthorizeInteractionResponseGenerator interactionGenerator,
+            IAuthorizeResponseGenerator authorizeResponseGenerator,
+            IUserSession userSession)
             : base(events, logger, options, validator, interactionGenerator, authorizeResponseGenerator, userSession)
         {
         }
@@ -54,7 +54,12 @@ namespace IdentityServer4.Endpoints
                 return new StatusCodeResult(HttpStatusCode.MethodNotAllowed);
             }
 
+            // TODO:
+            // – тут нужно авторизовать пользователя и создать куку, если есть подтверждение от IdP, что всё ок, если не ок, то можно кинуть ошибку
+            // + разобраться как формируется редирект (как используется authorize callback) – прост редиректит всегда на него
+            // + разобраться как consent использует месседжи – нужно сделать эндпоинт для сохранения консента
             var user = await UserSession.GetUserAsync();
+
             var result = await ProcessAuthorizeRequestAsync(values, user, null);
 
             Logger.LogTrace("End authorize request. result type: {0}", result?.GetType().ToString() ?? "-none-");

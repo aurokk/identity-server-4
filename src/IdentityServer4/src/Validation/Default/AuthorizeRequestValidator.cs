@@ -74,6 +74,7 @@ namespace IdentityServer4.Validation
                 return loadClientResult;
             }
 
+            // TODO: вот эта фича кажется вообще не нужна, посмотреть
             // load request object
             var roLoadResult = await LoadRequestObjectAsync(request);
             if (roLoadResult.IsError)
@@ -81,6 +82,7 @@ namespace IdentityServer4.Validation
                 return roLoadResult;
             }
 
+            // TODO: вот эта фича кажется вообще не нужна, посмотреть
             // validate request object
             var roValidationResult = await ValidateRequestObjectAsync(request);
             if (roValidationResult.IsError)
