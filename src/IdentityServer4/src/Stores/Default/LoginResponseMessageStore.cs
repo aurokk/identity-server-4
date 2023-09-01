@@ -3,11 +3,11 @@ using IdentityServer4.Models;
 
 namespace IdentityServer4.Stores;
 
-internal class LoginMessageStore : ILoginMessageStore
+internal class LoginResponseMessageStore : ILoginResponseMessageStore
 {
     protected readonly MessageCookie<LoginResponse> Cookie;
 
-    public LoginMessageStore(MessageCookie<LoginResponse> cookie)
+    public LoginResponseMessageStore(MessageCookie<LoginResponse> cookie)
     {
         Cookie = cookie;
     }

@@ -21,7 +21,7 @@ namespace IdentityServer4.Services
         private readonly IHttpContextAccessor _context;
         private readonly IMessageStore<LogoutMessage> _logoutMessageStore;
         private readonly IMessageStore<ErrorMessage> _errorMessageStore;
-        private readonly IConsentMessageStore _consentMessageStore;
+        private readonly IConsentResponseMessageStore _consentResponseMessageStore;
         private readonly IPersistedGrantService _grants;
         private readonly IUserSession _userSession;
         private readonly ILogger _logger;
@@ -32,7 +32,7 @@ namespace IdentityServer4.Services
             IHttpContextAccessor context,
             IMessageStore<LogoutMessage> logoutMessageStore,
             IMessageStore<ErrorMessage> errorMessageStore,
-            IConsentMessageStore consentMessageStore,
+            IConsentResponseMessageStore consentResponseMessageStore,
             IPersistedGrantService grants,
             IUserSession userSession,
             ReturnUrlParser returnUrlParser,
@@ -42,7 +42,7 @@ namespace IdentityServer4.Services
             _context = context;
             _logoutMessageStore = logoutMessageStore;
             _errorMessageStore = errorMessageStore;
-            _consentMessageStore = consentMessageStore;
+            _consentResponseMessageStore = consentResponseMessageStore;
             _grants = grants;
             _userSession = userSession;
             _returnUrlParser = returnUrlParser;
@@ -131,7 +131,7 @@ namespace IdentityServer4.Services
             }
 
             var consentRequest = new ConsentRequest(request, subject);
-            await _consentMessageStore.WriteAsync(consentRequest.Id, new Message<ConsentResponse>(consent, _clock.UtcNow.UtcDateTime));
+            await _consentResponseMessageStore.WriteAsync(consentRequest.Id, new Message<ConsentResponse>(consent, _clock.UtcNow.UtcDateTime));
         }
 
         public Task DenyAuthorizationAsync(AuthorizationRequest request, AuthorizationError error, string errorDescription = null)

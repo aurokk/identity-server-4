@@ -14,6 +14,7 @@ using IdentityServer4.ResponseHandling;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using IdentityServer4.Validation;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -21,9 +22,10 @@ namespace IdentityServer4.Endpoints
 {
     internal class AuthorizeCallbackEndpoint : AuthorizeEndpointBase
     {
-        private readonly ILoginMessageStore _loginMessageStore;
-        private readonly IConsentMessageStore _consentResponseStore;
+        private readonly ILoginResponseMessageStore _loginResponseMessageStore;
+        private readonly IConsentResponseMessageStore _consentResponseResponseStore;
         private readonly IAuthorizationParametersMessageStore _authorizationParametersMessageStore;
+        private readonly ILoginResponseIdToRequestIdMessageStore _loginResponseIdToRequestIdMessageStore;
 
         public AuthorizeCallbackEndpoint(
             IEventService events,
@@ -33,13 +35,15 @@ namespace IdentityServer4.Endpoints
             IAuthorizeInteractionResponseGenerator interactionGenerator,
             IAuthorizeResponseGenerator authorizeResponseGenerator,
             IUserSession userSession,
-            IConsentMessageStore consentResponseStore,
-            ILoginMessageStore loginMessageStore,
+            IConsentResponseMessageStore consentResponseResponseStore,
+            ILoginResponseMessageStore loginResponseMessageStore,
+            ILoginResponseIdToRequestIdMessageStore loginResponseIdToRequestIdMessageStore,
             IAuthorizationParametersMessageStore authorizationParametersMessageStore = null)
             : base(events, logger, options, validator, interactionGenerator, authorizeResponseGenerator, userSession)
         {
-            _consentResponseStore = consentResponseStore;
-            _loginMessageStore = loginMessageStore;
+            _consentResponseResponseStore = consentResponseResponseStore;
+            _loginResponseMessageStore = loginResponseMessageStore;
+            _loginResponseIdToRequestIdMessageStore = loginResponseIdToRequestIdMessageStore;
             _authorizationParametersMessageStore = authorizationParametersMessageStore;
         }
 
@@ -57,30 +61,51 @@ namespace IdentityServer4.Endpoints
             if (_authorizationParametersMessageStore != null)
             {
                 // TODO: поисследовать че за мессадж стор
+                // никакой докуменатции нет, похоже это не работает, но идея, в целом, была неплохой
                 var messageStoreId = parameters[Constants.AuthorizationParamsStore.MessageStoreIdParameterName];
                 var entry = await _authorizationParametersMessageStore.ReadAsync(messageStoreId);
                 parameters = entry?.Data.FromFullDictionary() ?? new NameValueCollection();
-
                 await _authorizationParametersMessageStore.DeleteAsync(messageStoreId);
             }
 
-            var loginRequestId = Guid.NewGuid().ToString("N");
-            var loginRequest = new LoginRequest(parameters, loginRequestId);
-            var loginResult = await _loginMessageStore.ReadAsync(loginRequest.Id);
-            if (loginResult is { Data: null })
-            {
-                return await CreateErrorResultAsync("login message is missing data");
-            }
-
-            // TODO:
-            // – тут нужно авторизовать пользователя и создать куку, если есть подтверждение от IdP, что всё ок, если не ок, то можно кинуть ошибку
-            //   так же как в AuthorizeEndpoint
             var user = await UserSession.GetUserAsync();
 
-            // TODO:
-            // – на куках не очень удобно, нужны редиректы, чтоб прописать куки
+            var loginResponseId = parameters["loginResponseId"];
+            if (user == null)
+            {
+                // TODO: переписать нормально
+                if (loginResponseId == null)
+                {
+                    return await CreateErrorResultAsync("missing loginResponseId");
+                }
+
+                var loginResponseIdToRequestIdMessage =
+                    await _loginResponseIdToRequestIdMessageStore.ReadAsync(loginResponseId);
+                if (loginResponseIdToRequestIdMessage == null)
+                {
+                    return await CreateErrorResultAsync("unknown loginResponseId");
+                }
+
+                var loginResponseMessage = await _loginResponseMessageStore.ReadAsync(loginResponseId);
+                if (loginResponseMessage == null)
+                {
+                    return await CreateErrorResultAsync("missing loginResponseId");
+                }
+
+                {
+                    var identityServerUser = new IdentityServerUser(loginResponseMessage.Data.SubjectId)
+                    {
+                        IdentityProvider = "identity", // TODO
+                        AuthenticationTime =  DateTime.UtcNow, // TODO
+                    };
+                    await context.SignInAsync(identityServerUser, new AuthenticationProperties { IsPersistent = true });
+                    context.User = identityServerUser.CreatePrincipal();
+                    user = context.User;
+                }
+            }
+
             var consentRequest = new ConsentRequest(parameters, user?.GetSubjectId());
-            var consentResult = await _consentResponseStore.ReadAsync(consentRequest.Id);
+            var consentResult = await _consentResponseResponseStore.ReadAsync(consentRequest.Id);
             if (consentResult is { Data: null })
             {
                 return await CreateErrorResultAsync("consent message is missing data");
@@ -88,7 +113,7 @@ namespace IdentityServer4.Endpoints
 
             try
             {
-                var result = await ProcessAuthorizeRequestAsync(parameters, user, consentResult?.Data);
+                var result = await ProcessAuthorizeRequestAsync(parameters, user, consentResult?.Data, loginResponseId);
 
                 Logger.LogTrace("End Authorize Request. Result type: {0}", result?.GetType().ToString() ?? "-none-");
 
@@ -98,7 +123,7 @@ namespace IdentityServer4.Endpoints
             {
                 if (consentResult != null)
                 {
-                    await _consentResponseStore.DeleteAsync(consentRequest.Id);
+                    await _consentResponseResponseStore.DeleteAsync(consentRequest.Id);
                 }
             }
         }

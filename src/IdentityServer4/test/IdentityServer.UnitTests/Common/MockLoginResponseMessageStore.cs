@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IdentityServer4.Models;
@@ -5,16 +7,17 @@ using IdentityServer4.Stores;
 
 namespace IdentityServer.UnitTests.Common;
 
-public class MockLoginMessageStore : ILoginMessageStore
+public class MockLoginResponseMessageStore : ILoginResponseMessageStore
 {
-    public Dictionary<string, Message<LoginResponse>> Messages { get; set; } = new Dictionary<string, Message<LoginResponse>>();
+    private readonly ConcurrentDictionary<string, Message<LoginResponse>> _messages = new();
 
     public Task DeleteAsync(string id)
     {
-        if (id != null && Messages.ContainsKey(id))
+        if (id != null && _messages.ContainsKey(id))
         {
-            Messages.Remove(id);
+            _messages.Remove(id, out _);
         }
+
         return Task.CompletedTask;
     }
 
@@ -23,14 +26,15 @@ public class MockLoginMessageStore : ILoginMessageStore
         Message<LoginResponse> val = null;
         if (id != null)
         {
-            Messages.TryGetValue(id, out val);
+            _messages.TryGetValue(id, out val);
         }
+
         return Task.FromResult(val);
     }
 
     public Task WriteAsync(string id, Message<LoginResponse> message)
     {
-        Messages[id] = message;
+        _messages[id] = message;
         return Task.CompletedTask;
     }
 }

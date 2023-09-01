@@ -25,7 +25,7 @@ namespace IdentityServer.UnitTests.Services.Default
         private MockMessageStore<LogoutNotificationContext> _mockEndSessionStore = new MockMessageStore<LogoutNotificationContext>();
         private MockMessageStore<LogoutMessage> _mockLogoutMessageStore = new MockMessageStore<LogoutMessage>();
         private MockMessageStore<ErrorMessage> _mockErrorMessageStore = new MockMessageStore<ErrorMessage>();
-        private MockConsentMessageStore _mockConsentStore = new MockConsentMessageStore();
+        private MockConsentResponseMessageStore _mockConsentResponseStore = new MockConsentResponseMessageStore();
         private MockPersistedGrantService _mockPersistedGrantService = new MockPersistedGrantService();
         private MockUserSession _mockUserSession = new MockUserSession();
         private MockReturnUrlParser _mockReturnUrlParser = new MockReturnUrlParser();
@@ -40,7 +40,7 @@ namespace IdentityServer.UnitTests.Services.Default
                 _mockMockHttpContextAccessor,
                 _mockLogoutMessageStore,
                 _mockErrorMessageStore,
-                _mockConsentStore,
+                _mockConsentResponseStore,
                 _mockPersistedGrantService,
                 _mockUserSession,
                 _mockReturnUrlParser,
@@ -143,9 +143,9 @@ namespace IdentityServer.UnitTests.Services.Default
             };
             await _subject.GrantConsentAsync(req, new ConsentResponse(), null);
 
-            _mockConsentStore.Messages.Should().NotBeEmpty();
+            _mockConsentResponseStore.Messages.Should().NotBeEmpty();
             var consentRequest = new ConsentRequest(req, "bob");
-            _mockConsentStore.Messages.First().Key.Should().Be(consentRequest.Id);
+            _mockConsentResponseStore.Messages.First().Key.Should().Be(consentRequest.Id);
         }
     }
 }

@@ -25,25 +25,40 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
 
         private HttpContext _context;
 
-        private TestEventService _fakeEventService = new TestEventService();
+        private TestEventService _fakeEventService =
+            new TestEventService();
 
-        private ILogger<AuthorizeEndpoint> _fakeLogger = TestLogger.Create<AuthorizeEndpoint>();
+        private ILogger<AuthorizeEndpoint> _fakeLogger =
+            TestLogger.Create<AuthorizeEndpoint>();
 
-        private IdentityServerOptions _options = new IdentityServerOptions();
+        private IdentityServerOptions _options =
+            new IdentityServerOptions();
 
-        private MockUserSession _mockUserSession = new MockUserSession();
+        private MockUserSession _mockUserSession =
+            new MockUserSession();
 
-        private NameValueCollection _params = new NameValueCollection();
+        private NameValueCollection _params =
+            new NameValueCollection();
 
-        private StubAuthorizeRequestValidator _stubAuthorizeRequestValidator = new StubAuthorizeRequestValidator();
+        private StubAuthorizeRequestValidator _stubAuthorizeRequestValidator =
+            new StubAuthorizeRequestValidator();
 
-        private StubAuthorizeResponseGenerator _stubAuthorizeResponseGenerator = new StubAuthorizeResponseGenerator();
+        private StubAuthorizeResponseGenerator _stubAuthorizeResponseGenerator =
+            new StubAuthorizeResponseGenerator();
 
-        private StubAuthorizeInteractionResponseGenerator _stubInteractionGenerator = new StubAuthorizeInteractionResponseGenerator();
+        private StubAuthorizeInteractionResponseGenerator _stubInteractionGenerator =
+            new StubAuthorizeInteractionResponseGenerator();
+
+        private MockLoginRequestIdToResponseIdMessageStore _mockLoginRequestIdToResponseIdMessageStore =
+            new MockLoginRequestIdToResponseIdMessageStore();
+
+        private MockLoginResponseIdToRequestIdMessageStore _mockLoginResponseIdToRequestIdMessageStore =
+            new MockLoginResponseIdToRequestIdMessageStore();
 
         private AuthorizeEndpoint _subject;
 
-        private ClaimsPrincipal _user = new IdentityServerUser("bob").CreatePrincipal();
+        private ClaimsPrincipal _user =
+            new IdentityServerUser("bob").CreatePrincipal();
 
         private ValidatedAuthorizeRequest _validatedAuthorizeRequest;
 
@@ -107,7 +122,10 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
                 _stubAuthorizeRequestValidator,
                 _stubInteractionGenerator,
                 _stubAuthorizeResponseGenerator,
-                _mockUserSession);
+                _mockUserSession,
+                _mockLoginRequestIdToResponseIdMessageStore,
+                _mockLoginResponseIdToRequestIdMessageStore
+            );
         }
     }
 }

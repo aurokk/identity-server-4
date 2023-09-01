@@ -9,7 +9,7 @@ using IdentityServer4.Stores;
 
 namespace IdentityServer.UnitTests.Common
 {
-    public class MockConsentMessageStore : IConsentMessageStore
+    public class MockConsentResponseMessageStore : IConsentResponseMessageStore
     {
         public Dictionary<string, Message<ConsentResponse>> Messages { get; set; } = new Dictionary<string, Message<ConsentResponse>>();
 

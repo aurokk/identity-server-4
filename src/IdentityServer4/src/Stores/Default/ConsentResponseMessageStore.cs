@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace IdentityServer4.Stores
 {
-    internal class ConsentMessageStore : IConsentMessageStore
+    internal class ConsentResponseMessageStore : IConsentResponseMessageStore
     {
         protected readonly MessageCookie<ConsentResponse> Cookie;
 
-        public ConsentMessageStore(MessageCookie<ConsentResponse> cookie)
+        public ConsentResponseMessageStore(MessageCookie<ConsentResponse> cookie)
         {
             Cookie = cookie;
         }

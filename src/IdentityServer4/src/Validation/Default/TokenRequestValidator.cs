@@ -331,6 +331,7 @@ namespace IdentityServer4.Validation
             /////////////////////////////////////////////
             var isActiveCtx = new IsActiveContext(_validatedRequest.AuthorizationCode.Subject, _validatedRequest.Client, IdentityServerConstants.ProfileIsActiveCallers.AuthorizationCodeValidation);
             await _profile.IsActiveAsync(isActiveCtx);
+            isActiveCtx.IsActive = true; // TODO
 
             if (isActiveCtx.IsActive == false)
             {

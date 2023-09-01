@@ -10,7 +10,7 @@ namespace IdentityServer4.Stores
     /// <summary>
     /// Interface for consent messages that are sent from the consent UI to the authorization endpoint.
     /// </summary>
-    public interface IConsentMessageStore
+    public interface IConsentResponseMessageStore
     {
         /// <summary>
         /// Writes the consent response message.

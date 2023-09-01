@@ -25,30 +25,43 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
 
         private HttpContext _context;
 
-        private TestEventService _fakeEventService = new TestEventService();
+        private TestEventService _fakeEventService =
+            new TestEventService();
 
-        private ILogger<AuthorizeCallbackEndpoint> _fakeLogger = TestLogger.Create<AuthorizeCallbackEndpoint>();
+        private ILogger<AuthorizeCallbackEndpoint> _fakeLogger =
+            TestLogger.Create<AuthorizeCallbackEndpoint>();
 
-        private IdentityServerOptions _options = new IdentityServerOptions();
+        private IdentityServerOptions _options =
+            new IdentityServerOptions();
 
-        private MockLoginMessageStore _mockUserLoginResponseMessageStore = new MockLoginMessageStore();
+        private MockLoginResponseMessageStore _mockUserLoginResponseResponseMessageStore =
+            new MockLoginResponseMessageStore();
 
-        private MockConsentMessageStore _mockUserConsentResponseMessageStore = new MockConsentMessageStore();
+        private MockConsentResponseMessageStore _mockUserConsentResponseResponseMessageStore =
+            new MockConsentResponseMessageStore();
 
-        private MockUserSession _mockUserSession = new MockUserSession();
+        private MockLoginResponseIdToRequestIdMessageStore _mockLoginResponseIdToRequestIdMessageStore =
+            new MockLoginResponseIdToRequestIdMessageStore();
 
-        private NameValueCollection _params = new NameValueCollection();
+        private MockUserSession _mockUserSession =
+            new MockUserSession();
 
-        private StubAuthorizeRequestValidator _stubAuthorizeRequestValidator = new StubAuthorizeRequestValidator();
+        private NameValueCollection _params =
+            new NameValueCollection();
 
-        private StubAuthorizeResponseGenerator _stubAuthorizeResponseGenerator = new StubAuthorizeResponseGenerator();
+        private StubAuthorizeRequestValidator _stubAuthorizeRequestValidator =
+            new StubAuthorizeRequestValidator();
+
+        private StubAuthorizeResponseGenerator _stubAuthorizeResponseGenerator =
+            new StubAuthorizeResponseGenerator();
 
         private StubAuthorizeInteractionResponseGenerator _stubInteractionGenerator =
             new StubAuthorizeInteractionResponseGenerator();
 
         private AuthorizeCallbackEndpoint _subject;
 
-        private ClaimsPrincipal _user = new IdentityServerUser("bob").CreatePrincipal();
+        private ClaimsPrincipal _user =
+            new IdentityServerUser("bob").CreatePrincipal();
 
         private ValidatedAuthorizeRequest _validatedAuthorizeRequest;
 
@@ -68,7 +81,7 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
                 { "scope", "api1 api2" }
             };
             var request = new ConsentRequest(parameters, _user.GetSubjectId());
-            _mockUserConsentResponseMessageStore.Messages.Add(request.Id,
+            _mockUserConsentResponseResponseMessageStore.Messages.Add(request.Id,
                 new Message<ConsentResponse>(new ConsentResponse()));
 
             _mockUserSession.User = _user;
@@ -106,7 +119,7 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
                 { "scope", "api1 api2" }
             };
             var request = new ConsentRequest(parameters, _user.GetSubjectId());
-            _mockUserConsentResponseMessageStore.Messages.Add(request.Id, new Message<ConsentResponse>(null));
+            _mockUserConsentResponseResponseMessageStore.Messages.Add(request.Id, new Message<ConsentResponse>(null));
 
             _mockUserSession.User = _user;
 
@@ -133,7 +146,7 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
                 { "scope", "api1 api2" }
             };
             var request = new ConsentRequest(parameters, _user.GetSubjectId());
-            _mockUserConsentResponseMessageStore.Messages.Add(request.Id, null);
+            _mockUserConsentResponseResponseMessageStore.Messages.Add(request.Id, null);
 
             _mockUserSession.User = _user;
 
@@ -170,7 +183,7 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
                 { "scope", "api1 api2" }
             };
             var request = new ConsentRequest(parameters, _user.GetSubjectId());
-            _mockUserConsentResponseMessageStore.Messages.Add(request.Id,
+            _mockUserConsentResponseResponseMessageStore.Messages.Add(request.Id,
                 new Message<ConsentResponse>(new ConsentResponse()
                     { ScopesValuesConsented = new string[] { "api1", "api2" } }));
 
@@ -182,7 +195,7 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
 
             var result = await _subject.ProcessAsync(_context);
 
-            _mockUserConsentResponseMessageStore.Messages.Count.Should().Be(0);
+            _mockUserConsentResponseResponseMessageStore.Messages.Count.Should().Be(0);
         }
 
         [Fact]
@@ -196,7 +209,7 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
                 { "scope", "api1 api2" }
             };
             var request = new ConsentRequest(parameters, _user.GetSubjectId());
-            _mockUserConsentResponseMessageStore.Messages.Add(request.Id,
+            _mockUserConsentResponseResponseMessageStore.Messages.Add(request.Id,
                 new Message<ConsentResponse>(new ConsentResponse()
                     { ScopesValuesConsented = new string[] { "api1", "api2" } }));
 
@@ -241,8 +254,9 @@ namespace IdentityServer.UnitTests.Endpoints.Authorize
                 _stubInteractionGenerator,
                 _stubAuthorizeResponseGenerator,
                 _mockUserSession,
-                _mockUserConsentResponseMessageStore,
-                _mockUserLoginResponseMessageStore
+                _mockUserConsentResponseResponseMessageStore,
+                _mockUserLoginResponseResponseMessageStore,
+                _mockLoginResponseIdToRequestIdMessageStore
             );
         }
     }

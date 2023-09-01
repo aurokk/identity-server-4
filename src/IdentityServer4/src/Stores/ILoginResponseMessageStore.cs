@@ -6,7 +6,7 @@ namespace IdentityServer4.Stores;
 /// <summary>
 /// Interface for login messages that are sent from the login UI to the authorization endpoint.
 /// </summary>
-public interface ILoginMessageStore
+public interface ILoginResponseMessageStore
 {
     /// <summary>
     /// Writes the login response message.
